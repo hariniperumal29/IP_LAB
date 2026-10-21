@@ -1,0 +1,73 @@
+# EXP - 2: Image Resolution
+----------------------------
+!pip install opencv_python
+import cv2
+----------------------------
+# Reading an image
+image = cv2.imread("download.jpg")
+import matplotlib.pyplot as plt
+plt.imshow(image)
+--------------------------------
+# Converting to RGB
+image_rgb = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+plt.imshow(image_rgb)
+print(image_rgb.shape)
+-------------------------------------------------
+# Converting to gray
+gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+plt.imshow(gray_image,cmap='gray')
+-----------------------------------------------------
+# Different Interpolation Methods
+#(i) INTER_NEAREST : using nearest value to estimate new pixel value
+
+nearest = cv2.resize(gray_image,(100,100),interpolation = cv2.INTER_NEAREST)
+plt.imshow(nearest,cmap = 'gray')
+---------------------------------------
+#(ii) INTER_LINEAR : based on avg of nearest 4 pixels
+
+linear = cv2.resize(gray_image,(100,100),interpolation = cv2.INTER_LINEAR)
+plt.imshow(linear,cmap="gray")
+----------------------------------------------------------------------------
+#(iii) INTER_CUBIC : uses neighbouring 16 pixcels
+cubic = cv2.resize(gray_image,(100,100),interpolation = cv2.INTER_CUBIC)
+plt.imshow(cubic,cmap = "gray")
+--------------------------------------------------------------------------
+#(iv) INTER_AREA: uses area contribution
+
+area = cv2.resize(gray_image,(100,100),interpolation = cv2.INTER_AREA)
+plt.imshow(area,cmap = "gray")
+---------------------------------------------------------------------
+#(v)INTER_LANCZOS4 : 8* 8 neighbiruing pixels
+lan = cv2.resize(gray_image,(100,100),interpolation = cv2.INTER_LANCZOS4)
+plt.imshow(lan,cmap="gray")
+-------------------------------------------------------------------------
+
+# displaying images using subplot:
+
+# setting figure size : (w,h)
+plt.figure(figsize= (12,8))
+
+# subplot(r,c,pos)
+plt.subplot(2,3,1)
+plt.imshow(gray_image,cmap="gray")
+plt.title("Original Image")
+
+plt.subplot(2,3,2)
+plt.imshow(nearest,cmap="gray")
+plt.title("INTER_NEAREST")
+
+plt.subplot(2,3,3)
+plt.imshow(linear,cmap="gray")
+plt.title("INTER_LINEAR")
+
+plt.subplot(2,3,4)
+plt.imshow(cubic,cmap="gray")
+plt.title("INTER_CUBIC")
+
+plt.subplot(2,3,5)
+plt.imshow(area,cmap="gray")
+plt.title("INTER_AREA")
+
+plt.subplot(2,3,6)
+plt.imshow(lan,cmap="gray")
+plt.title("INTER_LANZOS4")
