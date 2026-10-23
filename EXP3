@@ -1,0 +1,106 @@
+# exp 3:
+# Image enchance ment:
+# Improving the quality Of image
+-------------------------------------
+image = cv2.imread("download.jpg")
+import matplotlib.pyplot as plt
+plt.imshow(image)
+------------------------------------
+# convert to gray_Scale
+gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+plt.imshow(gray_image,cmap = "gray")
+-------------------------------------------
+# (i) Enchnacement Technique:
+# (i) Image Negative : S = T(r) = (L - 1) - r
+# Darker regin --> brighter:
+# brighter region --> dark
+
+gray_neg = 255 - gray_image
+plt.imshow(gray_neg,cmap = 'gray')
+
+plt.figure(figsize= (12,8))
+plt.subplot(1,2,1)
+plt.imshow(gray_image,cmap = 'gray')
+plt.title("Gray Image")
+
+plt.subplot(1,2,2)
+plt.imshow(gray_neg,cmap = 'gray')
+plt.title("Gray negative image")
+-------------------------------------------
+# (ii) Log Transformation:
+import numpy as np
+# converting gray image to float value
+gray_float = gray_image.astype(np.float32)
+# Cal const :
+# c = 255/(log(1 + rmax))
+c = 255/ (np.log(1 + np.max(gray_float)))
+
+# log transformation: c * log(1 + r)
+log_trans = c* np.log(1 + gray_float)
+
+# convert to int
+
+log_trans = np.uint8(log_trans)
+
+------------------------------
+plt.imshow(log_trans,cmap = 'gray')
+
+plt.figure(figsize= (12,8))
+plt.subplot(1,2,1)
+plt.imshow(gray_image,cmap='gray')
+plt.title("Original Gray Image")
+
+plt.subplot(1,2,2)
+plt.imshow(log_trans,cmap ='gray')
+plt.title("Log Transformed")
+------------------------------------------
+# Inverse Log : s = c (e^r - 1)
+inverse = c * (np.exp(gray_float / 255) - 1)
+inverse = np.uint8(inverse)
+
+plt.imshow(inverse, cmap='gray')
+plt.show()
+-------------------------------------------
+# Power law :
+# s = c r ^ gamma
+
+gamma1 = 0.5
+# Perfomring normlized (/255) [0-1]
+normalized = gray_image/255.0
+# applying formula * 255 to convert to valid pixel and convert ot int
+gamma1_img = np.uint8(255 * (normalized **gamma1))
+
+gamma2 = 1.0
+gamma2_img = np.uint8(255*(normalized**gamma2))
+
+gamma3 = 1.5
+gamma3_img = np.uint8(255*(normalized**gamma3))
+
+gamma4 = 2.0
+gamma4_img = np.uint8(255*(normalized**gamma4))
+------------------------------------------------------------------
+plt.figure (figsize= (12,8))
+plt.subplot(2,2,1)
+plt.imshow(gamma1_img,cmap='gray')
+plt.title("Power Law : 0.5")
+
+plt.subplot(2,2,2)
+plt.imshow(gamma2_img,cmap = 'gray')
+plt.title("Power Law: 1.0")
+
+plt.subplot(2,2,3)
+plt.imshow(gamma3_img,cmap='gray')
+plt.title("Power Law : 1.5")
+
+plt.subplot(2,2,4)
+plt.imshow(gamma4_img,cmap='gray')
+plt.title("Power Lae : 2.0")
+-------------------------------------------------------------
+# Contrast Stretching:
+
+r_min = np.min(gray_image)
+r_max = np.max(gray_image)
+
+contrast = ((gray_image - r_min)/ (r_max - r_min)) * 255
+contrast = np.uint8(contrast)
+plt.imshow(contrast,cmap ='gray')
