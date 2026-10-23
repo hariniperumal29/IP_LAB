@@ -1,0 +1,111 @@
+# Dark image : 
+# converted to Gray
+
+dark_img = cv2.imread('dark_waterfall.jpg')
+import matplotlib.pyplot as plt
+plt.imshow(dark_img)
+
+dark_img = cv2.cvtColor(dark_img,cv2.COLOR_BGR2GRAY)
+plt.imshow(dark_img,cmap = 'gray')
+
+---------------------------------------------------------
+# Bright Image
+bright_img = cv2.imread('bright_waterfal.jpg')
+plt.imshow(bright_img)
+
+bright_img= cv2.cvtColor(bright_img,cv2.COLOR_BGR2GRAY)
+plt.imshow(bright_img,cmap='gray')
+----------------------------------------------------
+# Prinitng Histogram
+# syntax : cv2.calcHist(img,channels,mask,size,range)
+original_hist = cv2.calcHist([bright_img],[0],None,[256],[0,255])
+
+# Print values
+print(original_hist)
+
+# Plot histogram
+plt.plot(original_hist)
+plt.title("Original Histogram(INPUT IMG)")
+--------------------------------------------------------------------------
+ Histogram Equalization
+# converting to equalized img
+equalized_img = cv2.equalizeHist(dark_img)
+equalized_hist = cv2.calcHist([equalized_img],[0],None,[256],[0,256])
+plt.plot(equalized_hist)
+plt.title("Equalized Histogram [Input img]")
+-------------------------------------------------------------------
+plt.figure(figsize=(12,8))
+plt.subplot(2,2,1)
+plt.imshow(dark_img,cmap='gray')
+plt.title("Input image [Dark]")
+
+plt.subplot(2,2,2)
+plt.imshow(equalized_img,cmap='gray')
+print("Equalized image [dark]")
+plt.title("Equalized Image")
+
+plt.subplot(2,2,3)
+plt.plot(original_hist)
+plt.title("Original Histogram [Dark]")
+
+plt.subplot(2,2,4)
+plt.plot(equalized_hist)
+plt.title("Equalized Histogram[Dark]")
+---------------------------------------------------------------
+# Histogram Matching
+
+from skimage.exposure import match_histograms
+import numpy as np
+
+# this algorithm automatically cal histogram of both images and does matchnig
+matched_img = match_histograms(dark_img,bright_img)
+
+matched_img = np.uint8(matched_img)
+
+matched_hist = cv2.calcHist([matched_img],[0],None,[256],[0,256])
+
+plt.figure(figsize=(12,8))
+plt.subplot(1,2,1)
+plt.imshow(matched_img,cmap='gray')
+plt.title("Matched Image")
+
+plt.subplot(1,2,2)
+plt.plot(matched_hist)
+plt.title("Matched Histogram")
+--------------------------------------------------------------------------
+# Calculating Measures:
+from skimage.measure import shannon_entropy
+def cal_measures(image):
+    
+    # Mean: Brighteness --> high mean --> more brightness
+    #--. low mean --> less brightness
+    mean = np.mean(image)
+    
+    # S.D: Spread of pixel values in image
+    # more s.d --> spread over wider range
+    sd = np.std(image)
+
+    contrast = sd
+
+    # Entropy
+    entropy = shannon_entropy(image)
+
+    return mean,sd,contrast,entropy
+
+original_measure = cal_measures(dark_img)
+equalized_measure = cal_measures(equalized_img)
+matched_measure = cal_measures(matched_img)
+-----------------------------------------------------
+# Printing values:
+import pandas as pd
+data = pd.DataFrame(
+    {
+        'Image': ['Original_Img ','Equalized_Img','Matched_Img'],
+        'Mean' : [original_measure[0],equalized_measure[0],matched_measure[0]],
+        'SD' : [original_measure[1],equalized_measure[1],matched_measure[1]],
+        'Contrast' : [original_measure[2],equalized_measure[2],matched_measure[2]],
+        'Entopy' : [original_measure[3],equalized_measure[3],matched_measure[3]],
+    }
+)
+print(round(data,2))
+        
