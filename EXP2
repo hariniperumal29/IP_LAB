@@ -71,3 +71,93 @@ plt.title("INTER_AREA")
 plt.subplot(2,3,6)
 plt.imshow(lan,cmap="gray")
 plt.title("INTER_LANZOS4")
+---------------------------------------
+# GRAY_LEVEL_QUANTIZATION:
+# --> decreasing no. of different intensity levels
+
+# Formulas:
+
+# --> given bits
+# cal levels : 2^bits
+# cal interval :  Lin/Lout 
+# Lin--> no. of gray levels in original image
+# Lout --> no. of gray levels in O/p image [ levels]
+
+# quantized : 
+# r/interval * interval:
+# change intensity value
+
+
+def quantized_image (image,bits):
+    levels = 2**bits;
+    interval = 256/levels
+    quantized = (image//interval)*interval
+    quantized = quantized.astype(np.uint8)
+    return quantized
+
+quantized_8 = quantized_image(gray_image,8)
+quantized_4 = quantized_image(gray_image,4)
+quantized_2 = quantized_image(gray_image,2)
+--------------------------------------------------
+plt.figure(figsize = (12,8))
+plt.subplot(2,2,1)
+plt.imshow(gray_image,cmap="gray")
+
+plt.subplot(2,2,2)
+plt.imshow(quantized_8,cmap="gray")
+plt.title("8 bits")
+
+plt.subplot(2,2,3)
+plt.imshow(quantized_4,cmap= "gray")
+plt.title("4 bits")
+
+plt.subplot(2,2,4)
+plt.imshow(quantized_2,cmap = "gray")
+plt.title("2 bits")
+-------------------------------------------------
+# Calculating storage requirements
+
+#Printing Gray Levels:
+
+print("8 - bits : Number Of Gray Levels :",2**8)
+print("4 - bits : Number of Gray Levels:",2**4)
+print("2 bits: Number of Gray Levels:",2**2)
+-------------------------------------------------
+# Cal storage
+# --> bits,butes,kb
+
+no_of_pixels = h * w
+
+# 8 bits:
+
+storage_8bit = no_of_pixels * 8
+print("8 bit storage")
+print(storage_8bit,"bits")
+
+print(storage_8bit/8 ,"bytes")
+
+print(storage_8bit / (8 * 1024),"KB")
+
+print("-------------------------------")
+
+# 4 bits
+storage_4bit = no_of_pixels * 4
+print("4 bit storage")
+print(storage_4bit,"bits")
+
+print(storage_4bit/4 ,"bytes")
+
+print(storage_4bit / (4 * 1024),"KB")
+
+print("---------------------------------")
+
+
+# 2bits 
+storage_2bit = no_of_pixels * 2
+print("8 bit storage")
+print(storage_2bit,"bits")
+
+print(storage_2bit/2 ,"bytes")
+
+print(storage_2bit / (2 * 1024),"KB")
+----------------------------------------------------
