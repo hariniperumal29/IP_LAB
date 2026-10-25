@@ -1,0 +1,69 @@
+image = cv2.imread("cameraman.png")
+import matplotlib.pyplot as plt
+plt.imshow(image)
+print(image.shape)
+-------------------------------------
+gray_img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+plt.imshow(gray_img,cmap='gray')
+print(gray_img.shape)
+-----------------------------------------------
+# (i) Laplacian Sharpening:
+import numpy as np
+laplacian = cv2.Laplacian(gray_img,cv2.CV_64F)
+# cv2.laplacian: cal second order derivative: --> rapid change in pixel intensity
+#cv2.CV_64F: allows val to be +ve and float
+
+# g(x,y) =f(x,y) - laplacian 
+laplacian_sharp= gray_img.astype(np.float64) - laplacian
+
+# ensure pixels are in range 0 - 255
+laplacian_sharp = np.clip(laplacian_sharp,0,255).astype(np.uint8)
+
+
+
+plt.imshow(laplacian_sharp,cmap='gray')
+----------------------------------------------------------------
+#(ii) Unsharp Masking:
+
+# (i) Create Blur Image:
+#(,kernel ,derivative)
+
+blur_img = cv2.GaussianBlur(gray_img,(5,5),0)
+
+# (ii) UNsharp mask = original - blur:
+
+unsharp_mask = cv2.subtract(gray_img,blur_img)
+
+# (iii) Adding back to original with weights
+
+unsharp_img = cv2.addWeighted(gray_img,1.0,unsharp_mask,1.0,0)
+---------------------------------------------------------------
+#(iii) High boost 
+A = 2
+high_img = cv2.addWeighted(gray_img,A,blur_img,-1.0,0)
+plt.imshow(high_img,cmap ='gray')
+-------------------------------------------------------------
+plt.figure(figsize=(12,8))
+plt.subplot(2,3,1)
+plt.imshow(gray_img,cmap = 'gray')
+plt.title("Original Image")
+
+plt.subplot(2,3,2)
+plt.imshow(blur_img,cmap='gray')
+plt.title("blurred image")
+
+plt.subplot(2,3,3)
+plt.imshow(laplacian_sharp,cmap='gray')
+plt.title("Laplacian Sharpening")
+
+plt.subplot(2,3,4)
+plt.imshow(unsharp_mask,cmap = 'gray')
+plt.title("Unsharp Mask")
+
+plt.subplot(2,3,5)
+plt.imshow(unsharp_img,cmap='gray')
+plt.title("Unsharp img")
+
+plt.subplot(2,3,6)
+plt.imshow(high_img,cmap='gray')
+plt.title("High Boost")
