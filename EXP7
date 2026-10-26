@@ -1,0 +1,149 @@
+!pip install opencv_python
+import cv2
+---------------------------
+image = cv2.imread("cameraman.png")
+gray_img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+import matplotlib.pyplot as plt
+plt.imshow(gray_img,cmap ='gray')
+-----------------------------------------------
+# Fourier Transformation:
+# Converting spatial domain to frequency domain
+import numpy as np
+fourier_trans = np.fft.fft2(gray_img)
+# Gives output in complex number
+
+# By default : Zero frequency is at top left corner : shifting to center for better visualization
+fourier_shift = np.fft.fftshift(fourier_trans)
+
+# Fourier Transfomration gives 2 info
+
+#(i) Mganitude: strength of components: root(a2 + b2)
+magnitude = np.log(1 + np.abs(fourier_shift))
+# log : to compress value
+# abs : to cal magnitude
+
+#(ii) angle:
+angle = np.angle(fourier_shift)
+
+--------------------------------------------------------------------------------------------------
+# Displaying img
+plt.figure(figsize=(12,8))
+plt.subplot(1,3,1)
+plt.imshow(gray_img,cmap ='gray')
+plt.title("original img")
+
+plt.subplot(1,3,2)
+plt.imshow(magnitude,cmap='gray')
+plt.title("magnitude")
+
+# shows how waves combines to form structures:
+plt.subplot(1,3,3)
+plt.imshow(angle,cmap='gray')
+plt.title("angle")
+---------------------------------------------------------------------------
+
+# Applying Low pass Filter : intensity changes gradually
+# Low pass filter types:
+# (i) ideal
+ # (ii) Butter worth
+# (iii) Gaussian
+
+# First we are going to create filter mask  then apply to original img to see transformation;
+
+# filter size need to be same as img size so :
+
+# Cal rows and col
+r,c = gray_img.shape
+# cal center eleement
+cr,cc = r//2,r//2
+# cal row and col coorsinates: (u,v)
+# sub because : all -ve left , all +ve right:
+u = np.arange(r) - cr
+v=  np.arange (c) - cc
+
+# U,V tells where is freq in grid
+
+V,U = np.meshgrid(v,u)
+
+# distance of point from  center
+D = np.sqrt(V**2+U**2)
+
+# threshold / cutoff:
+D0 = 50
+---------------------------------------------------------------
+# Creating Ideal Mask
+# (I) Create 2-D array of zeros
+# fill with 1 where D<=D0
+
+ideal_mask = np.zeros((r,c))
+ideal_mask[D<=D0] = 1
+----------------------------------------------------
+# Butter worth mask :
+# Gradual decrease : center = 1 : no change , D = 50 : half change , d>50 : more change {reduce)
+n = 2
+Butter_mask = 1 / (1 + (D/D0) **(2*n))
+--------------------------------------------------------------------------------------------------
+# Gaussian Filter:
+# filter value decreases as distance increases
+gaussian_mask = np.exp(-(D**2)/(2*(D0**2))
+-----------------------------------------------------------------------------------------------
+# Applying filters:
+def apply_filter ( image,filters):
+    # multiplying to apply filter
+    output = image * filters
+    # shifting back zero freq [top left]
+    output_shift  = np.fft.ifftshift(output)
+    # converting back to spatial domain
+    output_img = np.fft.ifft2(output_shift)
+    # removing non-neg
+    filtered_img = np.abs(output_img)
+    #cliping to range
+    filtered_img = np.uint8(np.clip(filtered_img,0,255))
+    return filtered_img
+------------------------------------------------------------------------------------
+ideal = apply_filter(fourier_shift,ideal_mask)
+butter = apply_filter(fourier_shift,Butter_mask)
+gaussian = apply_filter(fourier_shift,gaussian_mask)
+---------------------------------------------------------------------------------
+# Ideal: 
+plt.figure(figsize=(12,8))
+plt.subplot(1,3,1)
+plt.imshow(gray_img,cmap = 'gray')
+plt.title("Original IMage")
+
+plt.subplot(1,3,2)
+plt.imshow(ideal_mask,cmap='gray')
+plt.title("Ideal Mask")
+
+plt.subplot(1,3,3)
+plt.imshow(ideal,cmap='gray')
+plt.title("Ideal Filter")
+--------------------------------------------------------------------------
+# Butter
+plt.figure(figsize=(12,8))
+plt.subplot(1,3,1)
+plt.imshow(gray_img,cmap = 'gray')
+plt.title("Original IMage")
+
+plt.subplot(1,3,2)
+plt.imshow(Butter_mask,cmap='gray')
+plt.title("Butter Mask")
+
+plt.subplot(1,3,3)
+plt.imshow(butter,cmap='gray')
+plt.title("Butter Filter")
+-------------------------------------------------------------
+# Gaussina
+plt.figure(figsize=(12,8))
+plt.subplot(1,3,1)
+plt.imshow(gray_img,cmap = 'gray')
+plt.title("Original IMage")
+
+plt.subplot(1,3,2)
+plt.imshow(gaussian_mask,cmap='gray')
+plt.title("Gaussian Mask")
+
+plt.subplot(1,3,3)
+plt.imshow(gaussian,cmap='gray')
+plt.title("GaussianFilter")
+---------------------------
